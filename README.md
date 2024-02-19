@@ -12,7 +12,7 @@ The `CudaOpenMP` sample demonstrates how to use OpenMP API to write an applicati
 
 ## Purpose
 
-The `CudaOpenMP` sample shows the execution of multiple atomic intrinsic functions on the device.
+The `CudaOpenMP` sample shows how to use OpenMP API in an application to run for multiple GPUs.
 
 > **Note**: The sample used the open-source SYCLomatic tool that assists developers in porting CUDA code to SYCL code. To finish the process, you must complete the rest of the coding manually and then tune to the desired level of performance for the target architecture. You can also use the Intel® DPC++ Compatibility Tool available to augment the Base Toolkit.
 
@@ -44,7 +44,7 @@ CUDA Systems Integration, OpenMP, Multithreading
 >**Note**: Refer to [Workflow for a CUDA* to SYCL* Migration](https://www.intel.com/content/www/us/en/developer/tools/oneapi/training/cuda-sycl-migration-workflow.html) for general information about the migration workflow.
 
 ## CUDA source code evaluation
-The `CudaOpenMP` sample demonstrates how to use OpenMP API to write an application for multiple GPUs.
+The `CudaOpenMP` sample demonstrates using OpenMP API to write an application for multiple GPUs.
 
 > **Note**: For more information on how to use the Syclomatic Tool, visit [Migrate from CUDA* to C++ with SYCL*](https://www.intel.com/content/www/us/en/developer/tools/oneapi/training/migrate-from-cuda-to-cpp-with-sycl.html#gs.vmhplg).
 
@@ -62,7 +62,7 @@ For this sample, the SYCLomatic tool automatically migrates 100% of the CUDA cod
    ```
 2. Change to the cudaOpenMP sample directory.
    ```
-   cd cuda-samples/tree/master/Samples/0_Introduction/cudaOpenMP
+   cd cuda-samples/Samples/0_Introduction/cudaOpenMP
    ```
 3. Generate a compilation database with intercept-build.
    ```
@@ -113,29 +113,21 @@ For this sample, the SYCLomatic tool automatically migrates 100% of the CUDA cod
    
    By default, this command sequence will build the `01_dpct_output` and `02_sycl_migrated` versions of the program.
    
-3. Run `01_dpct_output` on GPU.
+3. Run `01_dpct_output` on CPU and GPU.
    ```
-   make run
+   make run_cpu (runs on CPU)
+   make run_gpu (runs on Level-Zero Backend)
+   make run_gpu_opencl (runs on OpenCL Backend)
+   make run_gpu_cuda (runs on cuda Backend)
    ```
-   Run `01_dpct_output` on CPU.
+4. Run `02_sycl_migrated` on CPU and GPU.
    
    ```
-   export ONEAPI_DEVICE_SELECTOR=opencl:cpu
-   make run
-   unset ONEAPI_DEVICE_SELECTOR
+   make run_sm_cpu (runs on CPU)
+   make run_sm_gpu (runs on Level-Zero Backend)
+   make run_sm_gpu_opencl (runs on OpenCL Backend)
+   make run_gpu_cuda (runs on cuda Backend)
    ```
-4. Run `02_sycl_migrated` on GPU.
-   
-   ```
-   make run_sm
-   ```
-   Run `02_sycl_migrated` on CPU.
-   ```
-   export ONEAPI_DEVICE_SELECTOR=opencl:cpu
-   make run_sm
-   unset ONEAPI_DEVICE_SELECTOR
-   ```
-
 #### Troubleshooting
 
 If an error occurs, you can get more details by running `make` with
