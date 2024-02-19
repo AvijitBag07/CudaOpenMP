@@ -119,16 +119,11 @@ int main(int argc, char *argv[]) {
 
     // set and check the CUDA device for this CPU thread
     int gpu_id = -1;
-    /*
-    DPCT1093:15: The "cpu_thread_id %
-        num_gpus" device may be not the one intended for use. Adjust the
-    selected device if needed.
-    */
-    checkCudaErrors(DPCT_CHECK_ERROR(dpct::select_device(
+    DPCT_CHECK_ERROR(dpct::select_device(
         cpu_thread_id %
-        num_gpus))); // "% num_gpus" allows more CPU threads than GPU devices
-    checkCudaErrors(DPCT_CHECK_ERROR(
-        gpu_id = dpct::dev_mgr::instance().current_device_id()));
+        num_gpus)); // "% num_gpus" allows more CPU threads than GPU devices
+    DPCT_CHECK_ERROR(
+        gpu_id = dpct::dev_mgr::instance().current_device_id());
     printf("CPU thread %d (of %d) uses CUDA device %d\n", cpu_thread_id,
            num_cpu_threads, gpu_id);
 
@@ -142,49 +137,27 @@ int main(int argc, char *argv[]) {
     sycl::range<3> gpu_threads(1, 1, 128); // 128 threads per block
     sycl::range<3> gpu_blocks(1, 1, n / (gpu_threads[2] * num_cpu_threads));
 
-    checkCudaErrors(
-        DPCT_CHECK_ERROR(d_a = (int *)sycl::malloc_device(
-                             nbytes_per_kernel, dpct::get_in_order_queue())));
-    checkCudaErrors(DPCT_CHECK_ERROR(
-        dpct::get_in_order_queue().memset(d_a, 0, nbytes_per_kernel).wait()));
-    checkCudaErrors(DPCT_CHECK_ERROR(dpct::get_in_order_queue()
+    
+     DPCT_CHECK_ERROR(d_a = (int *)sycl::malloc_device(
+                             nbytes_per_kernel, dpct::get_in_order_queue()));
+     DPCT_CHECK_ERROR(
+        dpct::get_in_order_queue().memset(d_a, 0, nbytes_per_kernel).wait());
+     DPCT_CHECK_ERROR(dpct::get_in_order_queue()
                                          .memcpy(d_a, sub_a, nbytes_per_kernel)
-                                         .wait()));
-    /*
-    DPCT1049:0: The work-group size passed to the SYCL kernel may exceed the
-    limit. To get the device limit, query info::device::max_work_group_size.
-    Adjust the work-group size if needed.
-    */
+                                         .wait());
     dpct::get_in_order_queue().parallel_for(
         sycl::nd_range<3>(gpu_blocks * gpu_threads, gpu_threads),
         [=](sycl::nd_item<3> item_ct1) {
           kernelAddConstant(d_a, b, item_ct1);
         });
 
-    checkCudaErrors(DPCT_CHECK_ERROR(dpct::get_in_order_queue()
+    DPCT_CHECK_ERROR(dpct::get_in_order_queue()
                                          .memcpy(sub_a, d_a, nbytes_per_kernel)
-                                         .wait()));
-    checkCudaErrors(
-        DPCT_CHECK_ERROR(dpct::dpct_free(d_a, dpct::get_in_order_queue())));
+                                         .wait());
+   
+    DPCT_CHECK_ERROR(dpct::dpct_free(d_a, dpct::get_in_order_queue()));
   }
   printf("---------------------------\n");
-
-  /*
-  DPCT1010:16: SYCL uses exceptions to report errors and does not use the error
-  codes. The call was replaced with 0. You need to rewrite this code.
-  */
-  if (0 != 0)
-    /*
-    DPCT1009:17: SYCL uses exceptions to report errors and does not use the
-    error codes. The original code was commented out and a warning string was
-    inserted. You need to rewrite this code.
-    */
-    /*
-    DPCT1010:18: SYCL uses exceptions to report errors and does not use the
-    error codes. The call was replaced with 0. You need to rewrite this code.
-    */
-    printf("%s\n",
-           "cudaGetErrorString is not supported" /*cudaGetErrorString(0)*/);
 
   ////////////////////////////////////////////////////////////////
   // check the result
