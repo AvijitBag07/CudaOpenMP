@@ -15,4 +15,7 @@ include_directories(${CMAKE_SOURCE_DIR}/01_dpct_output/include/)
 add_executable (01_dpct_output Samples/0_Introduction/cudaOpenMP/cudaOpenMP.dp.cpp)
 target_link_libraries(01_dpct_output sycl)
 
-add_custom_target (run cd ${CMAKE_SOURCE_DIR}/01_dpct_output/ && ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/01_dpct_output)
+add_custom_target (run_sm_gpu_cuda  cd ${CMAKE_SOURCE_DIR}/01_dpct_output/ && ONEAPI_DEVICE_SELECTOR=cuda:gpu ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/01_dpct_output)
+add_custom_target (run_sm_cpu  cd ${CMAKE_SOURCE_DIR}/01_dpct_output/ && ONEAPI_DEVICE_SELECTOR=opencl:cpu ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/01_dpct_output)
+add_custom_target (run_sm_gpu  cd ${CMAKE_SOURCE_DIR}/01_dpct_output/ && ONEAPI_DEVICE_SELECTOR=level_zero:gpu ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/01_dpct_output)
+add_custom_target (run_sm_gpu_opencl  cd ${CMAKE_SOURCE_DIR}/01_dpct_output/ && ONEAPI_DEVICE_SELECTOR=opencl:gpu ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/01_dpct_output)
