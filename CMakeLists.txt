@@ -1,22 +1,25 @@
-if(INTEL_MAX_GPU)
-  #To build for Intel® Data Center GPU Max 1550 or 1100
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl -fsycl-targets=intel_gpu_pvc -Wall -Wformat-security -Werror=format-security -D INTEL_MAX_GPU")
-elseif (NVIDIA_GPU)
-  #To build for Nvidia GPU like P100, A100, H100 ...
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl -fsycl-targets=nvptx64-nvidia-cuda -D NVIDIA_GPU")
-else()
-  #To build for Intel® UHD Graphics, Intel® Gen9, Gen11, Xeon CPU 
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl -Wall -Wformat-security -Werror=format-security ")
-endif()
+cmake_minimum_required (VERSION 3.4.0)
 
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
-include_directories(${CMAKE_SOURCE_DIR}/02_sycl_migrated/Common/)
-include_directories(${CMAKE_SOURCE_DIR}/02_sycl_migrated/include/)
-add_executable (02_sycl_migrated Samples/0_Introduction/simpleAtomicIntrinsics/simpleAtomicIntrinsics_cpu.cpp Samples/0_Introduction/simpleAtomicIntrinsics/simpleAtomicIntrinsics.dp.cpp Samples/0_Introduction/simpleAtomicIntrinsics/simpleAtomicIntrinsics_kernel.dp.hpp)
-target_link_libraries(02_sycl_migrated sycl)
+set(CMAKE_CXX_COMPILER "icpx")
 
-add_custom_target (run_sm_gpu_cuda  cd ${CMAKE_SOURCE_DIR}/02_sycl_migrated/ && ONEAPI_DEVICE_SELECTOR=cuda:gpu ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/02_sycl_migrated)
-add_custom_target (run_sm_cpu  cd ${CMAKE_SOURCE_DIR}/02_sycl_migrated/ && ONEAPI_DEVICE_SELECTOR=opencl:cpu ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/02_sycl_migrated)
-add_custom_target (run_sm_gpu  cd ${CMAKE_SOURCE_DIR}/02_sycl_migrated/ && ONEAPI_DEVICE_SELECTOR=level_zero:gpu ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/02_sycl_migrated)
-add_custom_target (run_sm_gpu_opencl  cd ${CMAKE_SOURCE_DIR}/02_sycl_migrated/ && ONEAPI_DEVICE_SELECTOR=opencl:gpu ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/02_sycl_migrated)
+project (guided_simpleAtomicIntrinsics_SYCLMigration)
+# Set default build type to RelWithDebInfo if not specified
+if (NOT CMAKE_BUILD_TYPE)
+	message (STATUS "Default CMAKE_BUILD_TYPE not set using Release with Debug Info")
+	set (CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE
+	     STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel"
+	     FORCE)
+endif ()
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+option (BUILD_SYCL_MIGRATED_SUBPROJECT "Build targets from subproject 02_sycl_migrated" ON)
+
+if (BUILD_SYCL_MIGRATED_SUBPROJECT)
+    add_subdirectory (01_dpct_output)
+endif ()
+
+if (BUILD_SYCL_MIGRATED_SUBPROJECT)
+    add_subdirectory (02_sycl_migrated)
+endif ()
 
