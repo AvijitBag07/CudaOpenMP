@@ -76,7 +76,7 @@ For this sample, the SYCLomatic tool automatically migrates 100% of the CUDA cod
    ```
    
 
-## Build and Run the `Simple Atomic Intrinsics` Sample
+## Build and Run the `cudaOpenMP` Sample
 
 > **Note**: If you have not already done so, set up your CLI
 > environment by sourcing  the `setvars` script at the root of your oneAPI installation.
